@@ -7,6 +7,22 @@
 #include <fstream>
 #include <sstream>
 
+#define ASSERT(x) if (!(x)) __debugbreak();
+#define GLCall(x) GLClearError();\
+x;\
+ASSERT(GLLogCall(#x,__FILE__, __LINE__))
+
+static void GLClearError() {
+	while (glGetError() != GL_NO_ERROR);
+}
+
+static bool GLLogCall(const char* function, const char* file, int line) {
+	while (GLenum error = glGetError()) {
+		std::cout << "[OpenGL Error] (" << error << "):" << function << " " << file << " : " << line << std::endl;
+		return false;
+	}
+}
+
 struct ShaderSource {
 	std::string Vertex;
 	std::string Fragment;
@@ -149,16 +165,10 @@ int main() {
 	unsigned int shader = CreateShader(source.Vertex, source.Fragment);
 	glUseProgram(shader);
 
-	std::cout << "Vertex" << std::endl;
-	std::cout << source.Vertex << std::endl;
-	std::cout << "Fragment" << std::endl;
-	std::cout << source.Fragment << std::endl;
-
-
 	while (!glfwWindowShouldClose(window)) {
 		glClear(GL_COLOR_BUFFER_BIT);
 
-		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
+		GLCall(glDrawElements(GL_TRIANGLES, 6, GL_INT, nullptr););
 
 		glfwSwapBuffers(window);
 
@@ -185,4 +195,7 @@ which buffer and which shader you gonna chose
 we need to know layout of data(what the data means)
 vertex = more than position,but point itself
 shader :  program on gpu : vertex vs fragment
+element = draw something(ptr for vertex buffer(?))
+error code : black screen = panic
+glGetError(), glDebugMessageCallBack
 */
