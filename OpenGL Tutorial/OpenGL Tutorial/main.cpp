@@ -2,7 +2,51 @@
 #include <GL/glew.h>
 #include <GL/GL.h>
 #include <GLFW/glfw3.h>
+
 #include <iostream>
+#include <fstream>
+#include <sstream>
+
+struct ShaderSource {
+	std::string Vertex;
+	std::string Fragment;
+};
+
+enum TYPE {
+	NONE = -1, VERTEX = 0, FRAGMENT = 1
+};
+
+static ShaderSource ParseShaderSource(const std::string& filePath) {
+	std::fstream fs(filePath);
+	std::stringstream ss[2];
+	std::string line;
+	
+	TYPE type = TYPE::NONE;
+
+	if (!fs.is_open()) {
+		std::cout << "There is no file" << std::endl;
+		return {"", ""};
+	}
+	else {
+		while (std::getline(fs, line)) {
+			if (line.find("#shader") != std::string::npos) {
+				if (line.find("vertex") != std::string::npos) {
+					type = TYPE::VERTEX;
+				}
+				else if (line.find("fragment") != std::string::npos) {
+					type = TYPE::FRAGMENT;
+				}
+			}
+			else {
+				ss[(int)type] << line << '\n';
+			}
+		}
+	}
+
+	return { ss[0].str(), ss[1].str() };
+}
+
+
 
 static unsigned int CompileShader(unsigned int type, const std::string& source) {
 	unsigned int id = glCreateShader(type);
@@ -27,7 +71,7 @@ static unsigned int CompileShader(unsigned int type, const std::string& source) 
 	return id;
 }
 
-static unsigned int CreateShader(const std::string vertex, const std::string fragment) {
+static unsigned int CreateShader(const std::string& vertex, const std::string& fragment) {
 	unsigned int program = glCreateProgram();
 	unsigned int vs = CompileShader(GL_VERTEX_SHADER, vertex);
 	unsigned int fs = CompileShader(GL_FRAGMENT_SHADER, fragment);
@@ -89,26 +133,14 @@ int main() {
 	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2*sizeof(float), 0);
 
 	//shader
-	std::string vertexShader = 
-		"#version 330 core\n"
-		"\n"
-		"layout(location = 0) in vec4 position;\n"
-		"void main()\n"
-		"{\n"
-		"gl_Position = position;\n"
-		"}\n";
-
-	std::string fragmentShader =
-		"#version 330 core\n"
-		"\n"
-		"layout(location = 0) out vec4 color;\n"
-		"void main()\n"
-		"{\n"
-		"color = vec4(1.0, 0.0, 0.0, 1.0);\n"
-		"}\n";
-
-	unsigned shader = CreateShader(vertexShader, fragmentShader);
+	ShaderSource source = ParseShaderSource("someShader.shader");
+	unsigned int shader = CreateShader(source.Vertex, source.Fragment);
 	glUseProgram(shader);
+
+	std::cout << "Vertex" << std::endl;
+	std::cout << source.Vertex << std::endl;
+	std::cout << "Fragment" << std::endl;
+	std::cout << source.Fragment << std::endl;
 
 	while (!glfwWindowShouldClose(window)) {
 		glClear(GL_COLOR_BUFFER_BIT);
@@ -120,7 +152,7 @@ int main() {
 		glfwPollEvents();
 	}
 
-	glDeleteShader(shader);
+	glDeleteProgram(shader);
 
 	glfwTerminate();
 	
