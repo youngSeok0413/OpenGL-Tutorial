@@ -152,7 +152,7 @@ int main() {
 	glBindBuffer(GL_ARRAY_BUFFER, buffer);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(positions) * sizeof(float), positions, GL_STATIC_DRAW);
 
-	//vertex layout
+	//vertex layout : have to do everytime if layout has changed
 	glEnableVertexArrayAttrib(vao ,0);
 	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2*sizeof(float), 0);
 
@@ -170,6 +170,13 @@ int main() {
 	int location = glGetUniformLocation(shader, "u_Color");
 	float r = 0.0f;
 	float increment = 0.05f;
+
+	//reset
+	glUseProgram(0);
+	glBindVertexArray(0);
+
+	glUseProgram(shader);
+	glBindVertexArray(vao);
 
 	while (!glfwWindowShouldClose(window)) {
 		glClear(GL_COLOR_BUFFER_BIT);
@@ -213,4 +220,6 @@ element = draw something(ptr for vertex buffer(?))
 error code : black screen = panic
 glGetError(), glDebugMessageCallBack
 uniform : way c++ -> shader program(cpu -> gpu) vs vertex buffer AttribPointer
+vertex object is different from vertex buffer
+actually layout of buffer is not stored in the vetex buffer, but stored in the vao // vao = vertex arrayobj + 
 */
