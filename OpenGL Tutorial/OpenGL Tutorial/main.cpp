@@ -121,6 +121,8 @@ int main() {
 
 	glfwMakeContextCurrent(window);
 
+	glfwSwapInterval(1);
+
 	if (glewInit() != GLEW_OK) {
 		std::cout << "GLEW initiation error" << std::endl;
 		return -1;
@@ -165,10 +167,22 @@ int main() {
 	unsigned int shader = CreateShader(source.Vertex, source.Fragment);
 	glUseProgram(shader);
 
+	int location = glGetUniformLocation(shader, "u_Color");
+	float r = 0.0f;
+	float increment = 0.05f;
+
 	while (!glfwWindowShouldClose(window)) {
 		glClear(GL_COLOR_BUFFER_BIT);
 
-		GLCall(glDrawElements(GL_TRIANGLES, 6, GL_INT, nullptr););
+		GLCall(glUniform4f(location, r, 0.3f, 0.8f, 1.0f));
+		GLCall(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr););
+
+		if (r > 1)
+			increment = -0.05f;
+		else if (r < 0.0f)
+			increment = 0.05f;
+
+		r += increment;
 
 		glfwSwapBuffers(window);
 
@@ -198,4 +212,5 @@ shader :  program on gpu : vertex vs fragment
 element = draw something(ptr for vertex buffer(?))
 error code : black screen = panic
 glGetError(), glDebugMessageCallBack
+uniform : way c++ -> shader program(cpu -> gpu) vs vertex buffer AttribPointer
 */
