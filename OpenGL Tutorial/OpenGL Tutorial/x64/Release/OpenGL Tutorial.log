@@ -1,7 +1,8 @@
 ﻿  main.cpp
+  VertexArray.cpp
   Generating code
-  Previous IPDB and IOBJ mismatch, fall back to full compilation.
-D:\GitRepo\OpenGL-Tutorial\OpenGL Tutorial\OpenGL Tutorial\Renderer.cpp(14): warning C4715: 'GLLogCall': not all control paths return a value
-  All 219 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
+  3 of 286 functions ( 1.0%) were compiled, the rest were copied from previous compilation.
+    0 functions were new in current compilation
+    1 functions had inline decision re-evaluated but remain unchanged
   Finished generating code
   OpenGL Tutorial.vcxproj -> D:\GitRepo\OpenGL-Tutorial\OpenGL Tutorial\x64\Release\OpenGL Tutorial.exe

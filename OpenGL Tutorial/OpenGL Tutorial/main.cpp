@@ -11,6 +11,7 @@
 
 #include "VertexBuffer.h"
 #include "IndexBuffer.h"
+#include "VertexArray.h"
 
 struct ShaderSource {
 	std::string Vertex;
@@ -130,20 +131,26 @@ int main() {
 			0, 1, 2,
 			2, 3, 0
 		};
-
-		unsigned int vao;
-		glCreateVertexArrays(1, &vao);
-		glBindVertexArray(vao);
+		//vertex Array
+		VertexArray va;
 
 		//vertex buffer
 		VertexBuffer vb(positions, sizeof(float) * 4 * 2);
 
+		VertexBufferLayout layout;
+		layout.Push<float>(2);
+
+		va.AddBuffer(vb, layout);
+
 		//vertex layout : have to do everytime if layout has changed
-		glEnableVertexArrayAttrib(vao, 0);
-		glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), 0);
+
 
 		//index buffer
 		IndexBuffer ib(indices, 6);
+
+		va.Bind();
+		vb.Bind();
+		ib.Bind();
 
 		//shader
 		ShaderSource source = ParseShaderSource("someShader.shader");
@@ -153,6 +160,8 @@ int main() {
 		int location = glGetUniformLocation(shader, "u_Color");
 		float r = 0.0f;
 		float increment = 0.05f;
+
+		va.Bind();
 
 		while (!glfwWindowShouldClose(window)) {
 			glClear(GL_COLOR_BUFFER_BIT);
